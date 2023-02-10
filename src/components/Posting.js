@@ -11,111 +11,144 @@ import { useState } from 'react';
 import Multiselect from 'multiselect-react-dropdown'
 import './Posting.css';
 import Footer from './Footer.js';
+import { Link } from "react-router-dom";
+import Overview from './Overview';
+import axios from 'axios';
+
 const Posting = () => {
-  const data = [
-    {
-        "id": 1,
-        "city": "Kolkata ",
-        "state": "West Bengal"
-    },
-    {
-        "id": 2,
-        "city": "New Delhi",
-        "state": "Delhi"
-    },
-    {
-        "id": 3,
-        "city": "Chennai ",
-        "state": "Tamil Nadu"
-    },
-    {
-        "id": 4,
-        "city": "Mumbai",
-        "state": "Maharashtra"
-    },
-    {
-        "id": 5,
-        "city": "Bangalore",
-        "state": "Karnataka"
-    },
-    {
-        "id": 6,
-        "city": "Pune",
-        "state": "Maharashtra"
-    },
-    {
-        "id": 7,
-        "city": "Chennai ",
-        "state": "Tamil Nadu"
-    },
-    {
-        "id": 8,
-        "city": "Gurgaon",
-        "state": "Uttar Pradesh"
-    },
-    {
-        "id": 9,
-        "city": "Hyderabad",
-        "state": "Andhra Pradesh"
-    }
-]
-const [options] = useState(data);
 
 
-const skills = 
-[
-    {
-        "id": 1,
-        "skill": "java"
-    },
-    {
-        "id": 2,
-        "skill": "c++"
-    },
-    {
-        "id": 3,
-        "skill": "python"
-    },
-    {
-        "id": 4,
-        "skill": "javascript"
-    },
-    {
-        "id": 5,
-        "skill": "golang"
-    },
-    {
-        "id": 6,
-        "skill": "php"
-    },
-    {
-        "id": 7,
-        "skill": "node js"
-    },
-    {
-        "id": 8,
-        "skill": "mongo db"
-    },
-    {
-        "id": 9,
-        "skill": "react"
-    },
-    {
-        "id": 10,
-        "skill": "sql"
-    }
-];
 
 
-const [skill] = useState(skills);
 
-const [showhide, setShowhide] = useState("True");
+
+  function onSelect(selectedList, selectedItem) {
+    
+    // let skill_value = selectedItem.skill;
+    console.log(selectedList);
+    setSkill(selectedList);
+    
+   
+    
+    
+
+    
+
+    
+}
+
+function onSelect2(selectedList, selectedItem){
+  console.log(selectedList);
+  setCity(selectedList);
+}
+  let value = localStorage.getItem("email");
+  
+  const [clienty,setClienty] = useState()
+  useEffect(() => {
+    axios.get('http://34.205.65.36:4000/client/find/?{value}')
+    .then(response => {
+      console.log(response);
+      setClienty(response.data.id);
+      
+    })
+    .catch(err => {
+      console.log(err);
+    })
+  },[])
+  const[email,setEmail] = useState();
+  const handle = () => {
+    localStorage.setItem("emailData",email)
+  }
+
+const[knowloc,setKnowloc] = useState();
+
+
+
+  const postjob = (event) => {
+    event.preventDefault();
+    const jobprofile = event.target.jobprofile.value;
+    
+    let workfromhome = knowloc ===  'True' ? true : false;
+    console.log(workfromhome);
+    const openings = parseInt(event.target.openings.value);
+    const duration = parseInt(event.target.duration.value);
+    const responsibilities = event.target.responsibilities.value;
+    
+    
+    let cities = knowloc === 'True'? [] : city;
+    console.log(cities);
+    let skills = skill;
+    console.log(skills);
+    const stipendtype = event.target.stipendtype.value;
+    const stipendamountmax = parseInt(event.target.stipendamountmax.value);
+    let stipendamountmin = stipendtype === 'fixed' ? stipendamountmax : parseInt(event.target.stipendamountmin.value);
+    let clientId = clienty;
+    const database  = {jobprofile, workfromhome, openings, duration, responsibilities,skills,cities,stipendtype,stipendamountmax,stipendamountmin,  clientId};
+    console.log(database);
+    axios.post("http://34.205.65.36:4000/jobs/save", database)
+    .then(response => {
+      console.log(response);
+      window.alert("job Posted")
+    })
+    .catch(error =>{
+      console.log(error);
+      window.alert("Unable to Post Job");
+  })
+  };
+  
+// const [options] = useState(data);
+
+
+
+
+const [city, setCity] = useState();
+const [cities_opt,setCities_opt]=useState();
+
+useEffect(() => {
+  axios.get('http://34.205.65.36:4000/jobs/city/')
+  .then((response) =>{
+    console.log(response);
+    setCities_opt(response.data);
+  })
+  .catch(err=>{
+
+    console.log(err);
+  })
+
+},[])
+
+const [skill_opt,setSkill_opt] = useState();
+useEffect(() => {
+  axios.get('http://34.205.65.36:4000/jobs/skills/')
+  .then(response => {
+    console.log(response);
+    setSkill_opt(response.data);
+  })
+  .catch(err => {
+    console.log(err);
+  })
+}, [])
+
+const [skill,setSkill] = useState();
+
+const [showhide, setShowhide] = useState();
 const handleshow = event => {
   const getshow = event.target.value;
   setShowhide(getshow);
+  
 
 }
-const [opening, setOpening] = useState("fixed");
+
+
+const know_location = event => {
+
+
+  setKnowloc(event.target.value);
+}
+
+
+
+const [opening, setOpening] = useState();
 const openmenu = event => {
   const openshow = event.target.value;
   setOpening(openshow);
@@ -152,7 +185,7 @@ const openmenu = event => {
         </Navbar.Collapse>
       </Container>
     </Navbar>
-    <h1 class="text-xl-center">Job Posting</h1>
+    <h1 class="text-xl-center">Opportunities Posting</h1>
     <div class="container" >
     <div className="small-box dark-box mx-auto text-center">
 
@@ -161,52 +194,54 @@ const openmenu = event => {
     </div>
 
     <div className="row" id="box">
-      <Form >
-        {/* Job Profile */}
-      <Form.Group className="mb-3">
-        <Form.Label>Job Profile</Form.Label>
-        <Form.Control placeholder="Mention Job Profile" />
-        <Form.Text className="text-muted">
-          
-        </Form.Text>
-      </Form.Group>
+      <Form onSubmit={postjob}>
 
+     
 
+<div class="mb-3">
+  <label class="form-label">Opportunities Description </label>
+  <input  class="form-control" name="jobprofile" required/>
+  
+  
+</div>
 
+     
 
 
       {/* Workfrom Home Radio Button */}
 <div class="form-check">
-         <input class="form-check-input" type="radio" name="userdetail" value="True" id="flexRadioDefault1" checked={ showhide === 'True'} onClick={ handleshow}  />
+
+         <input class="form-check-input" type="radio" name='workfromhome' value="True" id="flexRadioDefault1" checked={ knowloc === 'True'} onClick={ know_location }  />
          <label class="form-check-label" for="flexRadioDefault1">
            Work From Home
          </label>
 </div>
 <div class="form-check">
-  <input class="form-check-input" type="radio" name="userdetail" value="false" id="flexRadioDefault1" onClick={ handleshow}  />
+  <input class="form-check-input" type="radio"  value="false" id="flexRadioDefault1" onClick={ know_location} checked={ knowloc === 'false'}  />
   <label class="form-check-label" for="flexRadioDefault1">
     In Office
   </label>
 </div>
 
 {
-  showhide   === 'false' && (
+  knowloc   === 'false' && (
     <div class="mb-3">
   <label class="form-label">Select Cities</label>
-  <Multiselect options={options} displayValue="city"></Multiselect>
+  <Multiselect options={cities_opt} displayValue="city" onSelect={onSelect2} name="cities" required></Multiselect>
+  
 </div>
 
   )
 }
 
 <div class="mb-3">
-  <label class="form-label">Total Opening</label>
-  <input  class="form-control" />
+  <label class="form-label" >Total Opening</label>
+  <input  class="form-control" type="number" name="openings" required/>
 </div>
 
 <div class="mb-3">
   <label class="form-label">Duration</label>
-  <input  class="form-control" />
+  <input  class="form-control" type="number" name='duration' required/>
   <Form.Text className="text-muted">
   Mention Duration in Months Only 
   </Form.Text>
@@ -215,24 +250,25 @@ const openmenu = event => {
 
 <div class="mb-3">
                         <label 
-                            class="text-left">Employee Responsibility</label>
-                        <textarea class="form-control"  rows="3"></textarea>
+                            class="text-left">Experts Responsibility</label>
+                        <textarea class="form-control"name='responsibilities'  rows="3" required></textarea>
                     </div>
 
 <div class="mb-3">
   <label class="form-label">Required Skillset</label>
-  <Multiselect options={skill} displayValue="skill"></Multiselect>
+  <Multiselect options={skill_opt} displayValue='skill' onSelect={onSelect} required></Multiselect>
+  
 </div>
 
 
 <div class="form-check">
-         <input class="form-check-input" type="radio" name="userdetail" value="fixed" id="flexRadioDefault1" checked={ opening === 'fixed'}  onClick={ openmenu }   />
+         <input class="form-check-input" type="radio" name='stipendtype'  value="fixed"  checked={ opening === 'fixed'}  onClick={ openmenu }   />
          <label class="form-check-label" for="flexRadioDefault1">
            Fixed
          </label>
 </div>
 <div class="form-check">
-  <input class="form-check-input" type="radio" name="userdetail" value="nominal" id="flexRadioDefault1" onClick={ openmenu }  />
+  <input class="form-check-input" type="radio"  value="nominal" onClick={ openmenu } checked={ opening === 'nominal'} />
   <label class="form-check-label" for="flexRadioDefault1">
     Nominal
   </label>
@@ -240,19 +276,19 @@ const openmenu = event => {
 
 <div class="mb-3">
   <label class="form-label">Stipend</label>
-  <input  class="form-control" placeholder='₹ 10,000'/>
+  <input  class="form-control" name='stipendamountmax' type="number"  placeholder='₹ 10,000' required/>
 </div>
 
 {
   opening === 'nominal'  && (
     <div class="mb-3">
   <label class="form-label">Minimum Stipend</label>
-  <input  class="form-control"  placeholder="₹ 8,000" />
+  <input  class="form-control" name='stipendamountmin' type="number" placeholder="₹ 8,000" required/>
 </div>
   )
 }
 <div className='col-md-12 text-center mb-3'>
-<Button variant="dark" className="btn-space">Upload</Button>
+<Button variant="dark" className="btn-space" type="submit">Upload</Button>
 <Button variant="danger" type="reset" value="Reset">Reset</Button>
 </div>
       </Form>
