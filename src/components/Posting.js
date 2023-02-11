@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Card from 'react-bootstrap/Card';
 import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
+import NavBar2 from './NavBar2'
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup'
@@ -11,7 +11,7 @@ import { useState } from 'react';
 import Multiselect from 'multiselect-react-dropdown'
 import './Posting.css';
 import Footer from './Footer.js';
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import Overview from './Overview';
 import axios from 'axios';
 
@@ -22,30 +22,27 @@ const Posting = () => {
 
 
 
-  function onSelect(selectedList, selectedItem) {
-    
+ 
+// For Constantly Updating the Skills
+function onSelect(selectedList, selectedItem) {
     // let skill_value = selectedItem.skill;
     console.log(selectedList);
     setSkill(selectedList);
-    
-   
-    
-    
-
-    
-
-    
 }
 
+// For Constantly Updating the cities
 function onSelect2(selectedList, selectedItem){
   console.log(selectedList);
   setCity(selectedList);
 }
-  let value = localStorage.getItem("email");
+
+  
+  let value = localStorage.getItem("email_client");
+  console.log(value);
   
   const [clienty,setClienty] = useState()
   useEffect(() => {
-    axios.get('http://34.205.65.36:4000/client/find/?{value}')
+    axios.get('http://34.205.65.36:4000/client/find/?email_client=value')
     .then(response => {
       console.log(response);
       setClienty(response.data.id);
@@ -55,10 +52,6 @@ function onSelect2(selectedList, selectedItem){
       console.log(err);
     })
   },[])
-  const[email,setEmail] = useState();
-  const handle = () => {
-    localStorage.setItem("emailData",email)
-  }
 
 const[knowloc,setKnowloc] = useState();
 
@@ -73,8 +66,6 @@ const[knowloc,setKnowloc] = useState();
     const openings = parseInt(event.target.openings.value);
     const duration = parseInt(event.target.duration.value);
     const responsibilities = event.target.responsibilities.value;
-    
-    
     let cities = knowloc === 'True'? [] : city;
     console.log(cities);
     let skills = skill;
@@ -100,8 +91,9 @@ const[knowloc,setKnowloc] = useState();
 
 
 
-
+// Setting City State Variable for Constantly Updating it
 const [city, setCity] = useState();
+
 const [cities_opt,setCities_opt]=useState();
 
 useEffect(() => {
@@ -117,7 +109,9 @@ useEffect(() => {
 
 },[])
 
+
 const [skill_opt,setSkill_opt] = useState();
+
 useEffect(() => {
   axios.get('http://34.205.65.36:4000/jobs/skills/')
   .then(response => {
@@ -135,15 +129,11 @@ const [showhide, setShowhide] = useState();
 const handleshow = event => {
   const getshow = event.target.value;
   setShowhide(getshow);
-  
-
 }
 
 
 const know_location = event => {
-
-
-  setKnowloc(event.target.value);
+setKnowloc(event.target.value);
 }
 
 
@@ -155,37 +145,9 @@ const openmenu = event => {
 }
   return (
     <>
-          <Navbar bg="light" expand="lg">
-      <Container fluid>
-       
-        <Navbar.Toggle aria-controls="navbarScroll" />
-        <Navbar.Collapse id="navbarScroll">
-          <Nav
-            className="me-auto my-2 my-lg-0"
-            style={{ maxHeight: '100px' }}
-            navbarScroll
-          >
-            <Nav.Link href="#action1">Home</Nav.Link>
-            <Nav.Link href="#action2">Link</Nav.Link>
-            <NavDropdown title="Link" id="navbarScrollingDropdown">
-              <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action4">
-                Another action
-              </NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action5">
-                Something else here
-              </NavDropdown.Item>
-            </NavDropdown>
-            
-          </Nav>
-          
-            <Button variant="outline-dark">Log Out</Button>
-        
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
-    <h1 class="text-xl-center">Opportunities Posting</h1>
+    <NavBar2 />
+         
+    <h1 class="text-center">Opportunities Posting</h1>
     <div class="container" >
     <div className="small-box dark-box mx-auto text-center">
 
@@ -217,7 +179,7 @@ const openmenu = event => {
          </label>
 </div>
 <div class="form-check">
-  <input class="form-check-input" type="radio"  value="false" id="flexRadioDefault1" onClick={ know_location} checked={ knowloc === 'false'}  />
+  <input class="form-check-input" type="radio"  value="false" id="flexRadioDefault1" onClick={know_location} checked={ knowloc === 'false'}  />
   <label class="form-check-label" for="flexRadioDefault1">
     In Office
   </label>
